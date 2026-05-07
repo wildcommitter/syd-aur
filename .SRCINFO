@@ -1,0 +1,22 @@
+pkgbase = syd-git
+	pkgdesc = Rock-solid application kernel for sandboxing applications on Linux
+	pkgver = 3.52.0.r11388.gd2bdd4d
+	pkgrel = 1
+	url = https://git.sr.ht/~alip/syd
+	arch = x86_64
+	license = GPL-3.0-only
+	makedepends = git
+	makedepends = rust
+	makedepends = scdoc
+	makedepends = pkgconf
+	depends = libseccomp
+	depends = gcc-libs
+	provides = syd
+	provides = sydbox
+	conflicts = syd
+	conflicts = sydbox
+	options = !lto
+	source = syd::git+https://git.sr.ht/~alip/syd#branch=next
+	sha256sums = SKIP
+
+pkgname = syd-git

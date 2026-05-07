@@ -1,0 +1,8 @@
+# makepkg work + output
+src/
+pkg/
+syd/
+*.pkg.tar.zst
+*.pkg.tar.xz
+*.tar.gz
+*.log
