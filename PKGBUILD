@@ -1,11 +1,11 @@
 # Maintainer: Guillermo C. <user@wildcommitter.org>
 pkgname=syd-git
 _pkgname=syd
-pkgver=3.52.0.r11461.g316084c
+pkgver=0.0.0
 pkgrel=1
 pkgdesc="Rock-solid application kernel for sandboxing applications on Linux"
 arch=('x86_64')
-url="https://git.sr.ht/~alip/syd"
+url="https://gitlab.exherbo.org/sydbox/sydbox"
 license=('GPL-3.0-only')
 depends=('libseccomp' 'gcc-libs')
 makedepends=('git' 'rust' 'scdoc' 'pkgconf')
@@ -13,11 +13,9 @@ provides=('syd' 'sydbox')
 conflicts=('syd' 'sydbox')
 options=('!lto')
 source=(
-  "$_pkgname::git+https://git.sr.ht/~alip/syd#branch=next"
-  "hardened-malloc-lib.rs"
+  "$_pkgname::git+https://gitlab.exherbo.org/sydbox/sydbox.git#branch=next"
 )
 sha256sums=(
-  'SKIP'
   'SKIP'
 )
 
@@ -36,28 +34,6 @@ prepare() {
 
   export CARGO_HOME="$srcdir/cargo-home"
   cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
-
-  # Replace the hardened-malloc registry source with our fixed lib.rs.
-  # The vanilla version's GlobalAlloc::alloc ignores layout.align(), so any
-  # over-aligned type (e.g. AVX2 fixedbitset Block, 32-byte aligned via
-  # __m256i) gets a 16-byte-aligned pointer and crashes on first vmovdqa.
-  # Note: syd's Cargo.toml depends on hardened-malloc as a registry crate
-  # (NOT the local workspace member), so the fix must land in the unpacked
-  # registry source after `cargo fetch`. Reported upstream:
-  #   https://gist.github.com/escanda/e2123fe5275a77d9b8db560b402ceb78
-  # Drop this once upstream merges a fix.
-  local hm_dir
-  hm_dir=$(echo "$CARGO_HOME"/registry/src/*/hardened-malloc-[0-9]*/)
-  if [[ ! -f "$hm_dir/src/lib.rs" ]]; then
-    echo "ERROR: could not find hardened-malloc registry source ($hm_dir)" >&2
-    return 1
-  fi
-  install -m0644 "$srcdir/hardened-malloc-lib.rs" "$hm_dir/src/lib.rs"
-  # Bypass cargo's checksum verification for the modified file.
-  if [[ -f "$hm_dir/.cargo-checksum.json" ]]; then
-    sed -i 's/"src\/lib.rs":"[^"]*"/"src\/lib.rs":"0000000000000000000000000000000000000000000000000000000000000000"/' \
-        "$hm_dir/.cargo-checksum.json"
-  fi
 }
 
 build() {
